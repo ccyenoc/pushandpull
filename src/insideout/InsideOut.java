@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import javafx.util.Duration;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -33,8 +34,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Scanner;
+import java.util.regex.*;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.DropShadow;
@@ -43,7 +48,8 @@ public class InsideOut extends Application {
     
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final double ASPECT_RATIO = 16.0 / 9.0;
-    
+    public static boolean isUser=false;
+    public static String Username="";
     
     @Override
     public void start(Stage primaryStage) {
@@ -135,16 +141,12 @@ public class InsideOut extends Application {
            // registration guidelines
         yellowrec(registration);
         
-        Button backtohome=new Button("Confirm");
-        buttonfontsize(backtohome);
-        backtohome.setLayoutX(360);
-        backtohome.setLayoutY(300);
-        backtohome.setPrefSize(100,25);
-        Button tologinpage=new Button("Log In");
+        Button tologinpage=new Button("Confirm");
         buttonfontsize(tologinpage);
-        tologinpage.setLayoutX(500);
+        tologinpage.setLayoutX(400);
         tologinpage.setLayoutY(300);
-        tologinpage.setPrefSize(100,25);
+        tologinpage.setPrefSize(100,18);
+        
         
         // method call
         Label username=instruction(100,"username");
@@ -154,10 +156,20 @@ public class InsideOut extends Application {
         Label password=instruction(260,"password");
         TextField inputpassword =input("Enter your password:","password", 270.0 , 50.0);
         
-     
-        stackpane.getChildren().add(backtohome);      
-        registration.getChildren().addAll(inputusername,inputpassword,inputemail,backtohome,steps,step1,step2,step3,step4,step5
-        ,registrationtitle,tologinpage,username,email,password);
+        String[] registername={""};
+        inputusername.textProperty().addListener((observable, oldValue, newValue) -> {
+             registername[0] = newValue.trim();}); 
+        String [] registeremail={""};
+        inputemail.textProperty().addListener((observable, oldValue, newValue) -> {
+            registeremail[0] = newValue.trim();}); 
+        String[] registerpassword={""};
+        inputpassword.textProperty().addListener((observable, oldValue, newValue) -> {
+             registerpassword[0] = newValue.trim();}); 
+        
+        
+        stackpane.getChildren().add(tologinpage);      
+        registration.getChildren().addAll(inputusername,inputpassword,inputemail,tologinpage,steps,step1,step2,step3,step4,step5
+        ,registrationtitle,username,email,password);
         Scene pageregistration=new Scene (registration,700,400);
         pageregistration.setFill(Color.web("#a8c4f4"));
         
@@ -174,14 +186,27 @@ public class InsideOut extends Application {
         
         // method call
         username=instruction(100,"username");
-        inputusername=input("Enter your username :","username", 100.0 , 50.0);
+        TextField loginusername=input("Enter your username :","username", 100.0 , 50.0);
         email=instruction(180,"email");
-        inputemail=input("Enter your email :","email",180.0 ,50.0);
+        TextField loginemail=input("Enter your email :","email",180.0 ,50.0);
         password=instruction(260,"password");
-        inputpassword =input("Enter your password:","password", 270.0 , 50.0);
+        TextField loginpassword =input("Enter your password:","password", 270.0 , 50.0);
         Scene pagelogin=new Scene(logIn,700,400);
         pagelogin.setFill(Color.web("#a8c4f4"));
-        logIn.getChildren().addAll(loginbtn,username,inputusername,inputpassword,password,inputemail,email,logintitle);
+
+        String[] name = {""};
+        loginusername.textProperty().addListener((observable, oldValue, newValue) -> {
+             name[0] = newValue.trim();}); 
+
+        String[] useremail = {""};
+        loginemail.textProperty().addListener((observable, oldValue, newValue) -> {
+              useremail[0] = newValue.trim();});
+
+        String[] userpassword={""};
+        loginpassword.textProperty().addListener((observable, oldValue, newValue) -> {
+              userpassword[0] = newValue.trim();});
+
+        logIn.getChildren().addAll(loginbtn,username,loginusername,loginpassword,password,loginemail,email,logintitle);
         
 // main page
         AnchorPane mainPage=new AnchorPane();
@@ -227,9 +252,40 @@ public class InsideOut extends Application {
          Label amountinstruction=instruction(100,"Debit Amount");
          Label descriptioninstruction=instruction( 160,"Description");     
          
-         // to enter amount of debit/credit
-         TextField amountdebit=input("Enter Debit Amount :","Debit Amount", 100.0, 50.0);
-         TextArea descriptiond= description("Enter Description :","Description",185.0,50.0);
+         // to enter amount of debit
+        // Create the TextField for amount debit
+        TextField amountdebit = input("Enter Debit Amount:", "Debit Amount", 100.0, 50.0);
+        TextArea descriptiond = description("Enter Description:", "Description", 185.0, 50.0);
+
+        String[] descriptiondstr = {""};
+        descriptiond.textProperty().addListener((observable, oldValue, newValue) -> {
+        descriptiondstr[0] = newValue; // Update the description dynamically as user types
+        });
+
+
+        Button confirmdebit = new Button("Confirm");
+        confirmdebit.setStyle("-fx-background-color:#FED760;-fx-text-fill:black;");
+        confirmdebit.setFont(Font.font("Anton", 20)); 
+        confirmdebit.setLayoutX(500);
+        confirmdebit.setLayoutY(300);
+
+       confirmdebit.setOnAction(e -> {
+       final String input = amountdebit.getText(); // Get the text entered by the user in amountdebit TextField
+       try{
+          double debitamount =Double.parseDouble(input); 
+          Debit(debitamount, descriptiondstr[0], "Debit");
+          Label debitsuccesful=new Label("Succesfully Dedited");
+          popupMessage(debitsuccesful);
+          
+       }catch(Exception ex){
+           Label wrongcashformat=new Label("Wrong Cash Format eg.1000");
+           popupMessage(wrongcashformat);
+           ex.printStackTrace();
+       }
+         });
+
+
+
          
          ImageView piggybankdebit=new ImageView(piggybank);
          piggybankdebit.setLayoutX(150);
@@ -252,7 +308,7 @@ public class InsideOut extends Application {
          // to predicted deposit page
          // log out
          
-         debit.getChildren().addAll(amountdebit,descriptiond,debittitle,amountinstruction,descriptioninstruction,piggybankdebit,coindebit);
+         debit.getChildren().addAll(confirmdebit,amountdebit,descriptiond,debittitle,amountinstruction,descriptioninstruction,piggybankdebit,coindebit);
       
          
 // credit page
@@ -267,12 +323,31 @@ public class InsideOut extends Application {
          descriptioninstruction=instruction( 160,"Description");     
          
          // to enter amount of debit/credit
-         TextField amountcredit=input("Enter Credit Amount :","Credit Amount", 100.0, 50.0);
-         TextArea descriptionc= description("Enter Description :","Description",185.0,50.0);
-         
+        TextField amountcredit = input("Enter Debit Amount:", "Debit Amount", 100.0, 50.0);
+        TextArea descriptionc = description("Enter Description:", "Description", 185.0, 50.0);
 
-         
-         credit.getChildren().addAll(amountcredit,descriptionc,credittitle,amountinstruction,descriptioninstruction);
+        String[] descriptioncstr = {""};
+        descriptionc.textProperty().addListener((observable, oldValue, newValue) -> {
+        descriptioncstr[0] = newValue; // Update the description dynamically as user types
+        });
+
+
+       Button confirmcredit = new Button("Confirm");
+       confirmcredit.setOnAction(e -> {
+       final String input = amountcredit.getText(); // Get the text entered by the user in amountdebit TextField
+       try{
+          double creditamount =Double.parseDouble(input); 
+          Credit(creditamount, descriptioncstr[0], "Credit");
+          Label creditsuccesful=new Label("Succesfully Credited");
+          popupMessage(creditsuccesful);
+          
+       }catch(Exception ex){
+           Label wrongcashformat=new Label("Wrong Cash Format eg.1000");
+           popupMessage(wrongcashformat);
+           ex.printStackTrace();
+       }
+         });
+         credit.getChildren().addAll(amountcredit,descriptionc,credittitle,amountinstruction,descriptioninstruction,confirmcredit);
          
 // history page
         AnchorPane history=new AnchorPane();
@@ -356,10 +431,17 @@ public class InsideOut extends Application {
 // button action (navigation,setScene)
         primaryStage.setScene(pagehomepage);
         register.setOnAction(e-> primaryStage.setScene(pageregistration)); // to registration page
-        backtohome.setOnAction(e->primaryStage.setScene(pagehomepage)); // back to homepage
         login.setOnAction(e-> primaryStage.setScene(pagelogin)); // homepage to log in page
-        tologinpage.setOnAction(e-> primaryStage.setScene(pagelogin)); // registration to log in page
-        loginbtn.setOnAction(e-> primaryStage.setScene(pagemainPage)); //from login to mainpage
+        tologinpage.setOnAction(e->{
+                register(registername[0],registeremail[0],registerpassword[0]);
+                if(registrationValid==true){
+                primaryStage.setScene(pagelogin);}
+        }); // registration to log in page
+        loginbtn.setOnAction(e-> {
+          logIn(name[0], useremail[0], userpassword[0]);
+          if(isUser==true){
+            primaryStage.setScene(pagemainPage);}
+                }); //from login to mainpage
         debitbtn.setOnAction(e-> primaryStage.setScene(pagedebit));
         creditbtn.setOnAction(e->primaryStage.setScene(pagecredit));
         historybtn.setOnAction(e->primaryStage.setScene(pagehistory));
@@ -635,15 +717,15 @@ public class InsideOut extends Application {
         Button RHB =new Button("RHB");
         bankSelectionbtn(RHB,50,170,5,160);
         Button MayBank=new Button("MayBank");
-        bankSelectionbtn(MayBank,50,220,15,160);
+        bankSelectionbtn(MayBank,50,210,5,160);
         Button HongLeong=new Button("Hong Leong");
-        bankSelectionbtn(HongLeong,50,270,15,160);
+        bankSelectionbtn(HongLeong,50,250,5,160);
         Button Alliance=new Button("Alliance");
-        bankSelectionbtn(Alliance,50,320,15,160);
+        bankSelectionbtn(Alliance,50,290,5,160);
         Button AmBank=new Button("AmBank");
-        bankSelectionbtn(AmBank,50,370,15,160);
+        bankSelectionbtn(AmBank,50,330,5,160);
         Button StandardChartered=new Button("Standard Chartered");
-        bankSelectionbtn(StandardChartered,50,420,15,160);
+        bankSelectionbtn(StandardChartered,50,370,5,160);   
         Button confirmbtn=new Button("Confirm");
         confirmbtn.setStyle("-fx-background-color:#FEEBA8;-fx-text-fill:black;");
         confirmbtn.setFont(Font.font("Anton", 15));
@@ -709,7 +791,7 @@ public class InsideOut extends Application {
         Alliance.setOnAction(e -> { 
         label(alliancelbl);
         instruction.setVisible(false);
-        selectedBank="Alliance";
+        selectedBank="Allaince";
         });
         AmBank.setOnAction(e -> { 
         label(ambanklbl);
@@ -725,9 +807,7 @@ public class InsideOut extends Application {
         confirmbtn.setOnAction(c -> {
         if (selectedBank != null) {
             // Perform calculation and update the label
-            editBank(selectedBank);
             depositCalculator(selectedBank, depositLabel, pane);
-            updateCSVFile();
         } else {
             depositLabel.setText("Please select a bank first!");
         }
@@ -742,11 +822,12 @@ public class InsideOut extends Application {
     public void bankSelectionbtn(Button btn,double x,double y,double height,double width){
         btn.setStyle("-fx-background-color:#FEEBA8;-fx-text-fill:black;");
         btn.setFont(Font.font("Anton", 15));
+        btn.setPrefSize(height,width);
         btn.setLayoutX(x);
         btn.setLayoutY(y);
-        btn.setPrefSize(width,height);
-        btn.setVisible(false);
-        btn.setManaged(false);
+        btn.setVisible(true);
+        btn.setManaged(true);
+        btn.toFront();
     }
     
     public void setLabelVisibility(Label label) {
@@ -756,7 +837,7 @@ public class InsideOut extends Application {
     
     public void label(Label label){
        label.setStyle("-fx-background-color:#FFFFFF; -fx-text-fill: black; -fx-border-radius: 5px;");
-       label.setFont(Font.font("Anton", 15));  // Set the font family and size here
+       label.setFont(Font.font("Anton", 23));  // Set the font family and size here
        label.setLayoutX(100);
        label.setLayoutY(150);
        label.setVisible(true);
@@ -776,82 +857,391 @@ public class InsideOut extends Application {
     
 
 // functions
+// log in page
+    public static String userinfo="/Users/cye/NewFolder/InsideOut/src/userinfo - Sheet1.csv";
+    public static void logIn(String name,String email,String password){
+       String userfullinfo="";
+       String line="";
+       boolean foundUser=false;
+       try(BufferedReader reader=new BufferedReader(new FileReader(userinfo))){
+           boolean header=true;
+           found:{
+           while((line=reader.readLine())!=null){
+               if (header) {
+                header = false;
+                continue;
+            }
+              String findUser[]=line.split(",");
+              if(name.equals(findUser[0]) && password.equals(findUser[3]) && email.equals(findUser[2])){
+                       Username=name;
+                       isUser=true;
+                       Label welcomeuser=new Label("Welcome to InsideOut!");
+                       foundUser=true;
+                       popupMessage(welcomeuser);
+                       break found;
+                }
+           }
+               if(foundUser==false){
+               Label usernotfound=new Label("User Not Found!");
+               popupMessage(usernotfound);   
+  
+           }
+           
+           }
+           }catch (IOException ex){
+                 ex.printStackTrace();
+           }
+        
+       
+    }  
+   
+// registration page
+    static boolean registrationValid=false;
+    public static void register(String username,String email,String password){
+        String line="";
+        String newUserInfo="";
+        boolean header=true;
+        int lineIndex=0;
+        ArrayList<String> lines=new ArrayList<>();
+        try(BufferedReader reader=new BufferedReader(new FileReader(userinfo))){
+            userFound:{
+            while((line=reader.readLine())!=null){ // to check if there is exist user and username taken
+                if(header==true){
+                    header=false;
+                    lines.add(line);
+                    continue;
+                }
+                
+                String checkUser[]=line.split(",");
+                for(int i=0;i<checkUser.length;i++){
+                    if(checkUser[1].equals(email)){ // check whether user exists
+                        Label userexist=new Label("User Exist!");
+                        popupMessage(userexist);
+                        break userFound;
+                    }
+                    else if(checkUser[0].equals(username)){ // check if username taken
+                        Label usernameexist=new Label("Username Taken!");
+                        popupMessage(usernameexist);
+                        break userFound;
+                    }}
+                lineIndex++;   
+                lines.add(line);
+            }
+            
+            // generate userID
+            String []findLastID=lines.get(lineIndex).split(",");
+            // id without IO
+            String[] numID=findLastID[1].split("");
+            String ID="";
+            for(int i=2;i<numID.length;i++){
+                ID+=numID[i];
+            }
+            int lastID=Integer.parseInt(ID);
+            int newID=lastID+1;
+            String userID="IO"+String.format("%7s",newID).replace(" ","0");           
+            
+                    // when it is a new user and username is unique, check password and email format
+                    String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+                    boolean validEmail = Pattern.matches(emailRegex, email);
+                    if((password.length()<8) || (password.matches("[A-Z]+")) || password.matches("[a-z]+")){ // check if password hits requirement
+                        Label enhancePassword=new Label("Enter a Strong Password!");
+                        popupMessage(enhancePassword);
+                        break userFound;
+                    }
+                    else if(validEmail==false){
+                        Label emailInvalid=new Label("Invalid Email !");
+                        popupMessage(emailInvalid);
+                        break userFound;
+                    }
+                    
+                    registrationValid=true;
+                    if(registrationValid==true){
+                     newUserInfo=username+","+userID+","+email+","+password;
+                     store(userinfo,newUserInfo);
+                    }
+        }
+             
+        }
+        catch(IOException ex){
+                ex.printStackTrace();
+    }
+        
+    }
+// record debit and credit
+    static void store(String file,String content) {
+        String line;
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new FileWriter(file, true));
+
+            bw.newLine();
+            bw.write(content);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+
+        }
+        finally {
+            
+             try {
+                if (bw != null) {
+                    bw.close(); // Close BufferedWriter
+                }
+            }
+            catch (IOException e ){
+
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    static String filepath = "/Users/cye/NewFolder/InsideOut/src/recorddebitandcredit - Sheet1.csv";
+    static String transactioninfo="";
+    static int transactionID=1;
+    static double balance=0.0;
+    
+    static void readLastTransactionID() {
+    String line;
+    try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
+        boolean header = true;
+        while ((line = reader.readLine()) != null) {
+            if (header) {
+                header = false;
+                continue;
+            }
+            String[] columns = line.split(",");
+            if (columns.length > 1) {  // Ensure there are enough columns in the row
+           try {
+        int lastID = Integer.parseInt(columns[1].trim());  // Parse transaction ID (column 1 should be the ID)
+        if (lastID >= transactionID) {
+            transactionID = lastID + 1;  // Update transaction ID to the next number
+        }
+    } catch (NumberFormatException e) {
+        // If parsing fails, this row is skipped (invalid transaction ID format)
+        System.out.println("Invalid transaction ID in row: " + line);
+    }
+}
+        }
+    } catch (IOException ex) {
+        ex.printStackTrace();
+    }
+}
+
+    static ArrayList<String> getBalance=new ArrayList<>();
+    static void Debit(double amount,String description,String type){
+        String username=Username;
+        String line="";
+        readLastTransactionID();
+        try(BufferedReader reader=new BufferedReader(new FileReader(filepath));){
+            boolean header = true;
+            while ((line = reader.readLine()) != null) {
+                if(header){
+                    header=false;
+                    continue;
+                }
+                
+            String [] columns=line.split(",");
+           
+            if(!columns[0].equals(username)){ // if username is not the target , then loop it again
+                    getBalance.add(line);
+                    continue; // continue with the next row when it is not the target user
+                }
+            } 
+            
+            getBalance.add(line);
+            // to find the last balance user hold
+            if(!getBalance.isEmpty()){
+            int index=getBalance.size()-1;
+            String []splitedrow=getBalance.get(index).split(",");
+            int balanceIndex=splitedrow.length-1;
+            balance=Double.parseDouble(splitedrow[balanceIndex]);
+            }
+        }catch (IOException ex){
+            ex.printStackTrace();
+            }      
+        
+        balance+=amount;
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
+
+        
+        transactioninfo = username + "," + transactionID + ","+type+","+amount+"," +description+","+ date + "," + balance;
+        transactionID++;
+        store(filepath,transactioninfo);
+    }
+    
+    static void Credit(double amount,String description,String type){
+        String username=Username;
+        String line="";
+        readLastTransactionID();
+        try(BufferedReader reader=new BufferedReader(new FileReader(filepath));){
+            boolean header = true;
+            while ((line = reader.readLine()) != null) {
+                if(header){
+                    header=false;
+                    continue;
+                }
+                
+            String [] columns=line.split(",");
+         
+            if(columns[0].equals(username)){ // if username is not the target , then loop it again
+                    getBalance.add(line);
+                    continue; // continue with the next row when it is not the target user
+                }
+            } 
+            
+            // to find the last balance user hold
+            if(!getBalance.isEmpty()){
+            int index=getBalance.size()-1;
+            String []splitedrow=getBalance.get(index).split(",");
+            int balanceIndex=splitedrow.length-1;
+            balance=Double.parseDouble(splitedrow[balanceIndex]);
+            }
+            getBalance.clear();
+        }catch (IOException ex){
+            ex.printStackTrace();
+            }      
+        
+        balance-=amount;
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
+
+        
+        transactioninfo = username + "," + transactionID + ","+type+","+amount+"," +description+","+ date + "," + balance;
+        transactionID++;
+        store(filepath,transactioninfo);
+    }
+    
 // predicted deposit
     static String predictedDepositfilepath= "/Users/cye/NewFolder/InsideOut/src/predictDeposit.csv";
     static BufferedReader reader=null;
     static BufferedWriter writer=null;
-    static ArrayList<String> userRow=new ArrayList<>(); // this arrayList specify the elements for user
-    static ArrayList<String> updatedRows = new ArrayList<>(); // the row that will be rewrite into csv file with updated bank
-    static String userfullInfo=""; // this represents full info of user from username to predicted deposit
-    static int indexUser=0;
-    static String username="24004592";
-    
-    public static void editBank(String bank){ // this method aims to find user and add bank info ONLY
-        
-        try{
-            reader= new BufferedReader(new FileReader(predictedDepositfilepath));
-            String readline;
-            boolean userFound=false;
-            
-            while ((readline = reader.readLine()) != null) {  // read csv file one line by one line
-                String checkBank[]=readline.split(",");
-                if (checkBank[0].equals(username)) {
-
-                if (checkBank.length < 4) {
-                    while (checkBank.length < 4) {
-                        readline += ",";
-                        checkBank = readline.split(",");
-                    }
+       
+    public void depositCalculator(String bank,Label showDeposit,AnchorPane pane){
+        ArrayList<String> lines = new ArrayList<>(); // lines(form username to predicted deposit)
+        double predictedDeposit=0.0;
+        int userindex=0;
+       
+       // csv file is updated with bank so that calculation can be performed
+       try {
+            String targetUsername=Username; // example 
+            String line;
+            boolean header = true;
+            BufferedReader reader=new BufferedReader(new FileReader(predictedDepositfilepath));
+            while ((line = reader.readLine()) != null) {
+                if(header){
+                    lines.add(line);
+                    header=false;
+                    continue;
                 }
                 
+            String [] columns=line.split(",");
+         
+            if(!columns[0].equals(targetUsername)){ // if username is not the target , then loop it again
+                    lines.add(line); // to add all line into it
+                    continue; // continue with the next row when it is not the target user
+                }
+            
+            // when target user found
+                lines.add(line); // add targetuser row into the list
+                userindex=lines.size()-1; // index of the target user (row)  
+            
+                String[] column = lines.get(userindex).split(","); // split the row by , and store them in an array
+                String fullLine="";
                 
-                checkBank[2] = bank; // Update the bank column
-                readline = String.join(",", checkBank);
-                userFound = true;
-                userRow.clear(); // Ensure userRow only contains the target user's row
-                userRow.add(readline);
+                if(column.length>=2){ // if previously there is bank in csv file 
+                    column[2]=bank;  // replaced it
+                    for(int i=0;i<column.length;i++){
+                        if(i==column.length-1){
+                            fullLine+=column[i];
+                        }
+                        else{
+                            fullLine+=column[i]+",";
+                        }}
+                }
+                else{  // no bank record in csv file
+                 fullLine=line+","+bank; // concate the bank with ori line
+                }
+                
+                // String bankName = fullLine.split(",")[2];  // Get bank name
+                 String[] findBank = fullLine.split(","); // Parse the current state of the full line
+                 boolean depositRecord=true;
+                 if(findBank.length>=3){
+                     depositRecord=true;
+                 }
+                 else{
+                     depositRecord=false;
+                 }
+                 
+                 String bankName = findBank[2]; // Bank name (already updated or appended earlier)
+                 double savings = Double.parseDouble(findBank[1]); // Extract savings
+                 predictedDeposit = predictDeposit(bankName, savings); // Calculate predicted deposit
+
+                 StringBuilder updatedLine = new StringBuilder();
+                 if(depositRecord==true){ // if it has previous record
+                     findBank[3]=String.valueOf(predictedDeposit); // replace it with the latest predicted deposit
+                     for(int i=0;i<findBank.length;i++){
+                         if(i==findBank.length-1){
+                             updatedLine.append(findBank[i]);
+                             break;
+                         }
+                         updatedLine.append(findBank[i]).append(",");
+                     }
+                 }
+                 else{ // new user
+                   for(int i=0;i<findBank.length;i++){
+                       if(i==findBank.length-1){
+                           updatedLine.append(findBank[i]);
+                           break;
+                       }
+                       updatedLine.append(findBank[i]).append(",");
+                   }
+                 updatedLine.append(",").append(String.format("%.2f", predictedDeposit));
+                 }
+                 
+                 lines.set(userindex, updatedLine.toString());
+               
             }
-                // add the readline into updatedRows no matter it is user or not (rewrite the csv file)
-            updatedRows.add(readline); // Add the (updated or original) line to the new list
-        }
-
-
-                if (!userFound) {
-            System.out.println("User not found in CSV.");
-        }
-            BufferedWriter writer = new BufferedWriter(new FileWriter(predictedDepositfilepath));
-            for (String line : updatedRows) {
+            reader.close();
+            }
+        catch (IOException e) {
+            // Handle exception if the file is not found or there's an issue reading it
+            System.err.println("Error reading the file: " + e.getMessage());
+        } 
+       
+       // thisp part is extremely neccessary as it is acutually rewriting the entire csv file one line by one line
+       try (BufferedWriter writer = new BufferedWriter(new FileWriter(predictedDepositfilepath))) {
+        for (String line : lines) {
             writer.write(line);
             writer.newLine();
         }
-        writer.close();
-
-        if (!userRow.isEmpty()) {
-            userfullInfo = userRow.get(0); // Store the user's full info
-        }
         
+       writer.close();
     } catch (IOException e) {
-        e.printStackTrace();
-    } finally {
-        try {
-            if (reader != null) {
-                reader.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        System.err.println("Error writing to the file: " + e.getMessage());
     }
 
-       
+    showDeposit.setText("RM " + String.format("%.2f", predictedDeposit));
+    showDeposit.setStyle("-fx-background-color:#FFFFFF; -fx-text-fill: black; -fx-border-radius: 5px;");
+    showDeposit.setFont(Font.font("Anton", 23));  // Set the font family and size here
+    showDeposit.setLayoutX(50);
+    showDeposit.setLayoutY(260);
+    
+    if (!pane.getChildren().contains(showDeposit)) {
+    pane.getChildren().add(showDeposit);// Add the button only if it's not already in the parent
     }
-       
-    public void depositCalculator(String bank,Label showDeposit,AnchorPane pane){ // this method calculate predicted deposit of user ONLY
-        double predictedDeposit=0.0;
-        String bankName=userRow.get(2);
-        System.out.print(bankName);
-        double savings=Double.parseDouble(userRow.get(1));
-        
-        switch(bankName){
+    else{
+        pane.getChildren().remove(showDeposit);
+        pane.getChildren().add(showDeposit);
+    }
+    
+}
+
+    
+     public static double predictDeposit(String bankName,double savings){
+      double predictedDeposit=0.0;
+      switch(bankName){
                         case "RHB": predictedDeposit=savings*0.026;break;
                         case "MayBank": predictedDeposit=savings*0.025;break;
                         case "HongLeong": predictedDeposit=savings*0.023;break;
@@ -860,58 +1250,26 @@ public class InsideOut extends Application {
                         default: predictedDeposit=savings*0.0265;break;
                     
                     }
-        
-        System.out.print(predictedDeposit);
-        userfullInfo+=","+String.valueOf(predictedDeposit);
-        System.out.print(userfullInfo);
-        
-        showDeposit.setText("RM " + String.format("%.2f", predictedDeposit));
-        showDeposit.setStyle("-fx-background-color:#FFFFFF; -fx-text-fill: black; -fx-border-radius: 5px;");
-        showDeposit.setFont(Font.font("Anton", 15));  // Set the font family and size here
-    
-        pane.getChildren().add(showDeposit);
-    }
-    
-    public static void updateCSVFile() {
-    ArrayList<String> allLines = new ArrayList<>(); // to store all lines in csv
-    String readline;
-
-    try {
-     
-        reader=new BufferedReader(new FileReader(predictedDepositfilepath));
-        while ((readline = reader.readLine()) != null) {
-            String[] checkUser = readline.split(",");
-           
-            if (checkUser[0].equals(username)) {
-                allLines.add(userfullInfo); // if it the user, then add the fullinfo
-            } else {
-                // Keep other lines unchanged
-                allLines.add(readline); // if it is not reader, add the line being read
-            }
-        }
-        reader.close(); // Close the reader
-
-        // Write all updated lines back to the file
-        writer = new BufferedWriter(new FileWriter(predictedDepositfilepath));
-        for (String line : allLines) {
-            writer.write(line);
-            writer.newLine(); // Write each line followed by a newline
-        }
-        writer.close(); // Close the writer
-    } catch (IOException e) {
-        e.printStackTrace();
-    } finally {
-        // Safely close the reader and writer
-        try {
-            if (reader != null) reader.close();
-            if (writer != null) writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+       return predictedDeposit;
 }
+     
+// pop up message
+    public static void popupMessage(Label label) {
+     label.setStyle("-fx-text-fill:black;");
+     label.setFont(Font.font("Anton", 15));
+     label.setLayoutX(110);
+     label.setLayoutY(50);
+    Stage popupStage = new Stage();
+    StackPane root = new StackPane(label);
 
+    Scene scene = new Scene(root,300,100);
+    popupStage.setScene(scene);
+    popupStage.show();
 
+    PauseTransition delay = new PauseTransition(Duration.seconds(3));
+    delay.setOnFinished(event -> popupStage.close());
+    delay.play();
+}
    
  // main method
     public static void main (String[] args){
