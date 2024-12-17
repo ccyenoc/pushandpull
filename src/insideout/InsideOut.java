@@ -158,7 +158,7 @@ public class InsideOut extends Application {
         
         String[] registername={""};
         inputusername.textProperty().addListener((observable, oldValue, newValue) -> {
-             registername[0] = newValue.trim();}); 
+             registername[0] = newValue.trim();});
         String [] registeremail={""};
         inputemail.textProperty().addListener((observable, oldValue, newValue) -> {
             registeremail[0] = newValue.trim();}); 
@@ -274,8 +274,6 @@ public class InsideOut extends Application {
        try{
           double debitamount =Double.parseDouble(input); 
           Debit(debitamount, descriptiondstr[0], "Debit");
-          Label debitsuccesful=new Label("Succesfully Dedited");
-          popupMessage(debitsuccesful);
           
        }catch(Exception ex){
            Label wrongcashformat=new Label("Wrong Cash Format eg.1000");
@@ -333,13 +331,15 @@ public class InsideOut extends Application {
 
 
        Button confirmcredit = new Button("Confirm");
+       confirmcredit.setStyle("-fx-background-color:#FED760;-fx-text-fill:black;");
+       confirmcredit.setFont(Font.font("Anton", 20)); 
+       confirmcredit.setLayoutX(500);
+       confirmcredit.setLayoutY(300);
        confirmcredit.setOnAction(e -> {
        final String input = amountcredit.getText(); // Get the text entered by the user in amountdebit TextField
        try{
           double creditamount =Double.parseDouble(input); 
           Credit(creditamount, descriptioncstr[0], "Credit");
-          Label creditsuccesful=new Label("Succesfully Credited");
-          popupMessage(creditsuccesful);
           
        }catch(Exception ex){
            Label wrongcashformat=new Label("Wrong Cash Format eg.1000");
@@ -370,8 +370,50 @@ public class InsideOut extends Application {
         Label savingtitle=new Label("Saving");
         savingtitle=header(savingtitle,saving);
         
+        Label savingactivationlbl=new Label("Are you sure to activate it?");
+        savingactivationlbl.setLayoutX(50);
+        savingactivationlbl.setLayoutY(85);
+        savingactivationlbl.setFont(Font.font("Anton", 35));
         
-        saving.getChildren().addAll(savingtitle);
+        Label enterSavingPercentagelbl=new Label("Enter percentage(%) to be deducted from the next debit :");
+        enterSavingPercentagelbl.setLayoutX(50);
+        enterSavingPercentagelbl.setLayoutY(200);
+        enterSavingPercentagelbl.setFont(Font.font("Anton", 25));
+        enterSavingPercentagelbl.setVisible(false);
+        enterSavingPercentagelbl.setManaged(false);
+                  
+        Button yes=new Button("Yes");
+        yes.setStyle("-fx-background-color:#FED760;-fx-text-fill:black;");
+        yes.setFont(Font.font("Anton", 15)); 
+        yes.setPrefSize(50,15);
+        yes.setLayoutX(50);
+        yes.setLayoutY(150);
+        yes.setOnAction(e->{
+            enterSavingPercentagelbl.setVisible(true);
+            enterSavingPercentagelbl.setManaged(true);
+            enterPercentage(saving);
+        });
+        
+        
+        Button no=new Button("No");
+        no.setStyle("-fx-background-color:#FED760;-fx-text-fill:black;");
+        no.setFont(Font.font("Anton", 15)); 
+        no.setLayoutX(120);
+        no.setLayoutY(150);
+        no.setPrefSize(50,15);
+        no.setOnAction(e->{
+            Label selectother=new Label("Saving Not Activated, proceed with other page");
+            popupMessage(selectother);
+        });
+        
+        
+
+        TextField enterPercentage=input("Enter the percentage(%) to be deducted from next debit :", "percentage(%)", 100.0, 50.0);
+        
+        
+        
+        
+        saving.getChildren().addAll(savingtitle,yes,no,savingactivationlbl,enterSavingPercentagelbl);
         
 // credit loan page
          AnchorPane creditloan=new AnchorPane();
@@ -715,17 +757,17 @@ public class InsideOut extends Application {
 
         // button to click 
         Button RHB =new Button("RHB");
-        bankSelectionbtn(RHB,50,170,5,160);
+        bankSelectionbtn(RHB,50,170,15,150);
         Button MayBank=new Button("MayBank");
-        bankSelectionbtn(MayBank,50,210,5,160);
+        bankSelectionbtn(MayBank,50,205,15,150);
         Button HongLeong=new Button("Hong Leong");
-        bankSelectionbtn(HongLeong,50,250,5,160);
+        bankSelectionbtn(HongLeong,50,240,15,150);
         Button Alliance=new Button("Alliance");
-        bankSelectionbtn(Alliance,50,290,5,160);
+        bankSelectionbtn(Alliance,50,275,15,150);
         Button AmBank=new Button("AmBank");
-        bankSelectionbtn(AmBank,50,330,5,160);
+        bankSelectionbtn(AmBank,50,310,15,150);
         Button StandardChartered=new Button("Standard Chartered");
-        bankSelectionbtn(StandardChartered,50,370,5,160);   
+        bankSelectionbtn(StandardChartered,50,345,15,150);   
         Button confirmbtn=new Button("Confirm");
         confirmbtn.setStyle("-fx-background-color:#FEEBA8;-fx-text-fill:black;");
         confirmbtn.setFont(Font.font("Anton", 15));
@@ -774,31 +816,91 @@ public class InsideOut extends Application {
         
         RHB.setOnAction(e -> { 
         label(rhblbl);
+        MayBank.setVisible(false);
+        MayBank.setManaged(false);
+        HongLeong.setVisible(false);
+        HongLeong.setManaged(false);
+        Alliance.setVisible(false);
+        Alliance.setManaged(false);
+        AmBank.setVisible(false);
+        AmBank.setManaged(false);
+        StandardChartered.setVisible(false);
+        StandardChartered.setManaged(false);
         instruction.setVisible(false); 
         selectedBank="RHB";
         });
         MayBank.setOnAction(e -> { 
+        RHB.setVisible(false);
+        RHB.setManaged(false);
+        HongLeong.setVisible(false);
+        HongLeong.setManaged(false);
+        Alliance.setVisible(false);
+        Alliance.setManaged(false);
+        AmBank.setVisible(false);
+        AmBank.setManaged(false);
+        StandardChartered.setVisible(false);
+        StandardChartered.setManaged(false);
         label(maybanklbl); 
         showBankSelection(pane); 
         instruction.setVisible(false);
         selectedBank="MayBank";
         });
         HongLeong.setOnAction(e -> { 
+        RHB.setVisible(false);
+        RHB.setManaged(false);
+        MayBank.setVisible(false);
+        MayBank.setManaged(false);
+        Alliance.setVisible(false);
+        Alliance.setManaged(false);
+        AmBank.setVisible(false);
+        AmBank.setManaged(false);
+        StandardChartered.setVisible(false);
+        StandardChartered.setManaged(false);
         label(hongleonglbl);
         instruction.setVisible(false); 
         selectedBank="HongLeong";
         });
         Alliance.setOnAction(e -> { 
+        RHB.setVisible(false);
+        RHB.setManaged(false);
+        MayBank.setVisible(false);
+        MayBank.setManaged(false);
+        HongLeong.setVisible(false);
+        HongLeong.setManaged(false);
+        AmBank.setVisible(false);
+        AmBank.setManaged(false);
+        StandardChartered.setVisible(false);
+        StandardChartered.setManaged(false);
         label(alliancelbl);
         instruction.setVisible(false);
         selectedBank="Allaince";
         });
         AmBank.setOnAction(e -> { 
+        RHB.setVisible(false);
+        RHB.setManaged(false);
+        MayBank.setVisible(false);
+        MayBank.setManaged(false);
+        HongLeong.setVisible(false);
+        HongLeong.setManaged(false);
+        Alliance.setVisible(false);
+        Alliance.setManaged(false);
+        StandardChartered.setVisible(false);
+        StandardChartered.setManaged(false);
         label(ambanklbl);
         instruction.setVisible(false); 
         selectedBank="AmBank";
         });
         StandardChartered.setOnAction(e -> { 
+        RHB.setVisible(false);
+        RHB.setManaged(false);
+        MayBank.setVisible(false);
+        MayBank.setManaged(false);
+        HongLeong.setVisible(false);
+        HongLeong.setManaged(false);
+        Alliance.setVisible(false);
+        Alliance.setManaged(false);
+        AmBank.setVisible(false);
+        AmBank.setManaged(false);
         label(standardcharteredlbl);
         instruction.setVisible(false); 
         selectedBank="StandardChartered";
@@ -822,13 +924,14 @@ public class InsideOut extends Application {
     public void bankSelectionbtn(Button btn,double x,double y,double height,double width){
         btn.setStyle("-fx-background-color:#FEEBA8;-fx-text-fill:black;");
         btn.setFont(Font.font("Anton", 15));
-        btn.setPrefSize(height,width);
         btn.setLayoutX(x);
         btn.setLayoutY(y);
-        btn.setVisible(true);
-        btn.setManaged(true);
+        btn.setPrefSize(width,height);
+        btn.setVisible(false);
+        btn.setManaged(false);
         btn.toFront();
     }
+    
     
     public void setLabelVisibility(Label label) {
     label.setVisible(false);
@@ -996,231 +1099,86 @@ public class InsideOut extends Application {
         }
     }
 
-    static String filepath = "/Users/cye/NewFolder/InsideOut/src/recorddebitandcredit - Sheet1.csv";
     static String transactioninfo="";
     static int transactionID=1;
     static double balance=0.0;
-    
-    static void readLastTransactionID() {
-    String line;
-    try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
-        boolean header = true;
-        while ((line = reader.readLine()) != null) {
-            if (header) {
-                header = false;
-                continue;
-            }
-            String[] columns = line.split(",");
-            if (columns.length > 1) {  // Ensure there are enough columns in the row
-           try {
-        int lastID = Integer.parseInt(columns[1].trim());  // Parse transaction ID (column 1 should be the ID)
-        if (lastID >= transactionID) {
-            transactionID = lastID + 1;  // Update transaction ID to the next number
-        }
-    } catch (NumberFormatException e) {
-        // If parsing fails, this row is skipped (invalid transaction ID format)
-        System.out.println("Invalid transaction ID in row: " + line);
-    }
-}
-        }
-    } catch (IOException ex) {
-        ex.printStackTrace();
-    }
-}
-
     static ArrayList<String> getBalance=new ArrayList<>();
     static void Debit(double amount,String description,String type){
-        String username=Username;
-        String line="";
-        readLastTransactionID();
-        try(BufferedReader reader=new BufferedReader(new FileReader(filepath));){
-            boolean header = true;
-            while ((line = reader.readLine()) != null) {
-                if(header){
-                    header=false;
-                    continue;
-                }
-                
-            String [] columns=line.split(",");
-           
-            if(!columns[0].equals(username)){ // if username is not the target , then loop it again
-                    getBalance.add(line);
-                    continue; // continue with the next row when it is not the target user
-                }
-            } 
-            
-            getBalance.add(line);
-            // to find the last balance user hold
-            if(!getBalance.isEmpty()){
-            int index=getBalance.size()-1;
-            String []splitedrow=getBalance.get(index).split(",");
-            int balanceIndex=splitedrow.length-1;
-            balance=Double.parseDouble(splitedrow[balanceIndex]);
-            }
-        }catch (IOException ex){
-            ex.printStackTrace();
-            }      
+        Debit debit=new Debit(Username,amount,description,type);
+        Label message=debit.getLabel();
+        popupMessage(message);
         
-        balance+=amount;
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
-
-        
-        transactioninfo = username + "," + transactionID + ","+type+","+amount+"," +description+","+ date + "," + balance;
-        transactionID++;
-        store(filepath,transactioninfo);
     }
     
     static void Credit(double amount,String description,String type){
-        String username=Username;
-        String line="";
-        readLastTransactionID();
-        try(BufferedReader reader=new BufferedReader(new FileReader(filepath));){
-            boolean header = true;
-            while ((line = reader.readLine()) != null) {
-                if(header){
-                    header=false;
-                    continue;
-                }
-                
-            String [] columns=line.split(",");
-         
-            if(columns[0].equals(username)){ // if username is not the target , then loop it again
-                    getBalance.add(line);
-                    continue; // continue with the next row when it is not the target user
-                }
-            } 
-            
-            // to find the last balance user hold
-            if(!getBalance.isEmpty()){
-            int index=getBalance.size()-1;
-            String []splitedrow=getBalance.get(index).split(",");
-            int balanceIndex=splitedrow.length-1;
-            balance=Double.parseDouble(splitedrow[balanceIndex]);
-            }
-            getBalance.clear();
-        }catch (IOException ex){
-            ex.printStackTrace();
-            }      
+        Credit credit=new Credit(Username,amount,description,type);
+        Label message=credit.getLabel();
+        popupMessage(message);
+    }
+ 
+// savings
+    public static void enterPercentage(AnchorPane pane){
+        TextField enterPercentage = new TextField();
+        enterPercentage.setPromptText("Enter percentage(%) here :");
+        enterPercentage.setStyle("-fx-text-fill:black;");
+        enterPercentage.setFont(Font.font("Anton", 15)); 
+        enterPercentage.setPrefSize(150,15);
+        enterPercentage.setLayoutX(50);
+        enterPercentage.setLayoutY(250);
+        String[] savingPercentage = {""};
+        enterPercentage.textProperty().addListener((observable, oldValue, newValue) -> {
+        savingPercentage[0] = newValue.trim();
+        });
         
-        balance-=amount;
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
-
+        Button confirm=new Button("Confirm");
+        confirm.setStyle("-fx-background-color:#FED760;-fx-text-fill:black;");
+        confirm.setFont(Font.font("Anton", 15));
+        confirm.setPrefSize(100,20);
+        confirm.setLayoutX(220);
+        confirm.setLayoutY(250);
+        confirm.setOnAction(e-> {
+            Label savingSuccesful=new Label(savingPercentage[0]+"% will be deducted on next debit as saving.");
+            popupMessage(savingSuccesful);
+        });
         
-        transactioninfo = username + "," + transactionID + ","+type+","+amount+"," +description+","+ date + "," + balance;
-        transactionID++;
-        store(filepath,transactioninfo);
+        pane.getChildren().addAll(enterPercentage,confirm);
     }
     
 // predicted deposit
     static String predictedDepositfilepath= "/Users/cye/NewFolder/InsideOut/src/predictDeposit.csv";
     static BufferedReader reader=null;
     static BufferedWriter writer=null;
+    
+    public void userInList(){
+        String line="";
+       try(BufferedReader reader=new BufferedReader(new FileReader(predictedDepositfilepath))){
+           inlist:{
+               while((line=reader.readLine())!=null){
+                   String[]word=line.split(",");
+                   if(word[0].equals(Username)){
+                       break inlist;
+                   }
+                   else {
+                       break;
+                   }
+               }
+               
+               try(BufferedWriter writer=new BufferedWriter(new FileWriter(predictedDepositfilepath,true))){
+                   writer.write(Username);
+                   writer.newLine();
+                   break inlist;
+               }catch(IOException ex){
+                   ex.printStackTrace();
+               }
+           }
+       }catch(IOException ex){
+           ex.printStackTrace();
+       }
+    }
        
     public void depositCalculator(String bank,Label showDeposit,AnchorPane pane){
-        ArrayList<String> lines = new ArrayList<>(); // lines(form username to predicted deposit)
-        double predictedDeposit=0.0;
-        int userindex=0;
-       
-       // csv file is updated with bank so that calculation can be performed
-       try {
-            String targetUsername=Username; // example 
-            String line;
-            boolean header = true;
-            BufferedReader reader=new BufferedReader(new FileReader(predictedDepositfilepath));
-            while ((line = reader.readLine()) != null) {
-                if(header){
-                    lines.add(line);
-                    header=false;
-                    continue;
-                }
-                
-            String [] columns=line.split(",");
-         
-            if(!columns[0].equals(targetUsername)){ // if username is not the target , then loop it again
-                    lines.add(line); // to add all line into it
-                    continue; // continue with the next row when it is not the target user
-                }
-            
-            // when target user found
-                lines.add(line); // add targetuser row into the list
-                userindex=lines.size()-1; // index of the target user (row)  
-            
-                String[] column = lines.get(userindex).split(","); // split the row by , and store them in an array
-                String fullLine="";
-                
-                if(column.length>=2){ // if previously there is bank in csv file 
-                    column[2]=bank;  // replaced it
-                    for(int i=0;i<column.length;i++){
-                        if(i==column.length-1){
-                            fullLine+=column[i];
-                        }
-                        else{
-                            fullLine+=column[i]+",";
-                        }}
-                }
-                else{  // no bank record in csv file
-                 fullLine=line+","+bank; // concate the bank with ori line
-                }
-                
-                // String bankName = fullLine.split(",")[2];  // Get bank name
-                 String[] findBank = fullLine.split(","); // Parse the current state of the full line
-                 boolean depositRecord=true;
-                 if(findBank.length>=3){
-                     depositRecord=true;
-                 }
-                 else{
-                     depositRecord=false;
-                 }
-                 
-                 String bankName = findBank[2]; // Bank name (already updated or appended earlier)
-                 double savings = Double.parseDouble(findBank[1]); // Extract savings
-                 predictedDeposit = predictDeposit(bankName, savings); // Calculate predicted deposit
-
-                 StringBuilder updatedLine = new StringBuilder();
-                 if(depositRecord==true){ // if it has previous record
-                     findBank[3]=String.valueOf(predictedDeposit); // replace it with the latest predicted deposit
-                     for(int i=0;i<findBank.length;i++){
-                         if(i==findBank.length-1){
-                             updatedLine.append(findBank[i]);
-                             break;
-                         }
-                         updatedLine.append(findBank[i]).append(",");
-                     }
-                 }
-                 else{ // new user
-                   for(int i=0;i<findBank.length;i++){
-                       if(i==findBank.length-1){
-                           updatedLine.append(findBank[i]);
-                           break;
-                       }
-                       updatedLine.append(findBank[i]).append(",");
-                   }
-                 updatedLine.append(",").append(String.format("%.2f", predictedDeposit));
-                 }
-                 
-                 lines.set(userindex, updatedLine.toString());
-               
-            }
-            reader.close();
-            }
-        catch (IOException e) {
-            // Handle exception if the file is not found or there's an issue reading it
-            System.err.println("Error reading the file: " + e.getMessage());
-        } 
-       
-       // thisp part is extremely neccessary as it is acutually rewriting the entire csv file one line by one line
-       try (BufferedWriter writer = new BufferedWriter(new FileWriter(predictedDepositfilepath))) {
-        for (String line : lines) {
-            writer.write(line);
-            writer.newLine();
-        }
-        
-       writer.close();
-    } catch (IOException e) {
-        System.err.println("Error writing to the file: " + e.getMessage());
-    }
+        PredictedDeposit deposit=new PredictedDeposit(bank,Username);
+        double predictedDeposit=deposit.getDeposit();
 
     showDeposit.setText("RM " + String.format("%.2f", predictedDeposit));
     showDeposit.setStyle("-fx-background-color:#FFFFFF; -fx-text-fill: black; -fx-border-radius: 5px;");
@@ -1266,7 +1224,7 @@ public class InsideOut extends Application {
     popupStage.setScene(scene);
     popupStage.show();
 
-    PauseTransition delay = new PauseTransition(Duration.seconds(3));
+    PauseTransition delay = new PauseTransition(Duration.seconds(2));
     delay.setOnFinished(event -> popupStage.close());
     delay.play();
 }
