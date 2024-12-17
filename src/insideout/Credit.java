@@ -70,15 +70,19 @@ public class Credit {
         balance-=amount;
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
-        lbl=new Label("Succesfully Credited");
         
+        if(balance<0){
+        lbl=new Label("Balance less than 0!");
+        }
+        else{
         transactioninfo = username + "," + transactionID + ","+type+","+amount+"," +description+","+ date + "," + balance;
         transactionID++;
+        lbl=new Label("Succesfully Credited");
         store(filepath,transactioninfo);
         }
  
     }
-    
+    }
     public Label getLabel(){
         return lbl;
     }

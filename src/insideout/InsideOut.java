@@ -44,6 +44,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.DropShadow;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class InsideOut extends Application {
     
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -963,113 +965,20 @@ public class InsideOut extends Application {
 // log in page
     public static String userinfo="/Users/cye/NewFolder/InsideOut/src/userinfo - Sheet1.csv";
     public static void logIn(String name,String email,String password){
-       String userfullinfo="";
-       String line="";
-       boolean foundUser=false;
-       try(BufferedReader reader=new BufferedReader(new FileReader(userinfo))){
-           boolean header=true;
-           found:{
-           while((line=reader.readLine())!=null){
-               if (header) {
-                header = false;
-                continue;
-            }
-              String findUser[]=line.split(",");
-              if(name.equals(findUser[0]) && password.equals(findUser[3]) && email.equals(findUser[2])){
-                       Username=name;
-                       isUser=true;
-                       Label welcomeuser=new Label("Welcome to InsideOut!");
-                       foundUser=true;
-                       popupMessage(welcomeuser);
-                       break found;
-                }
-           }
-               if(foundUser==false){
-               Label usernotfound=new Label("User Not Found!");
-               popupMessage(usernotfound);   
-  
-           }
-           
-           }
-           }catch (IOException ex){
-                 ex.printStackTrace();
-           }
-        
+       LogIn userLogIn=new LogIn(name,email,password);
+       Label lbl=userLogIn.login();
+       popupMessage(lbl);
        
     }  
    
 // registration page
     static boolean registrationValid=false;
     public static void register(String username,String email,String password){
-        String line="";
-        String newUserInfo="";
-        boolean header=true;
-        int lineIndex=0;
-        ArrayList<String> lines=new ArrayList<>();
-        try(BufferedReader reader=new BufferedReader(new FileReader(userinfo))){
-            userFound:{
-            while((line=reader.readLine())!=null){ // to check if there is exist user and username taken
-                if(header==true){
-                    header=false;
-                    lines.add(line);
-                    continue;
-                }
-                
-                String checkUser[]=line.split(",");
-                for(int i=0;i<checkUser.length;i++){
-                    if(checkUser[1].equals(email)){ // check whether user exists
-                        Label userexist=new Label("User Exist!");
-                        popupMessage(userexist);
-                        break userFound;
-                    }
-                    else if(checkUser[0].equals(username)){ // check if username taken
-                        Label usernameexist=new Label("Username Taken!");
-                        popupMessage(usernameexist);
-                        break userFound;
-                    }}
-                lineIndex++;   
-                lines.add(line);
-            }
-            
-            // generate userID
-            String []findLastID=lines.get(lineIndex).split(",");
-            // id without IO
-            String[] numID=findLastID[1].split("");
-            String ID="";
-            for(int i=2;i<numID.length;i++){
-                ID+=numID[i];
-            }
-            int lastID=Integer.parseInt(ID);
-            int newID=lastID+1;
-            String userID="IO"+String.format("%7s",newID).replace(" ","0");           
-            
-                    // when it is a new user and username is unique, check password and email format
-                    String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-                    boolean validEmail = Pattern.matches(emailRegex, email);
-                    if((password.length()<8) || (password.matches("[A-Z]+")) || password.matches("[a-z]+")){ // check if password hits requirement
-                        Label enhancePassword=new Label("Enter a Strong Password!");
-                        popupMessage(enhancePassword);
-                        break userFound;
-                    }
-                    else if(validEmail==false){
-                        Label emailInvalid=new Label("Invalid Email !");
-                        popupMessage(emailInvalid);
-                        break userFound;
-                    }
-                    
-                    registrationValid=true;
-                    if(registrationValid==true){
-                     newUserInfo=username+","+userID+","+email+","+password;
-                     store(userinfo,newUserInfo);
-                    }
-        }
-             
-        }
-        catch(IOException ex){
-                ex.printStackTrace();
+        Registration userRegister=new Registration(username,email,password);
+        Label message=userRegister.register();
+        popupMessage(message);  
     }
-        
-    }
+    
 // record debit and credit
     static void store(String file,String content) {
         String line;
@@ -1194,21 +1103,6 @@ public class InsideOut extends Application {
         pane.getChildren().add(showDeposit);
     }
     
-}
-
-    
-     public static double predictDeposit(String bankName,double savings){
-      double predictedDeposit=0.0;
-      switch(bankName){
-                        case "RHB": predictedDeposit=savings*0.026;break;
-                        case "MayBank": predictedDeposit=savings*0.025;break;
-                        case "HongLeong": predictedDeposit=savings*0.023;break;
-                        case "Alliance": predictedDeposit=savings*0.0285;break;
-                        case "Ambank": predictedDeposit=savings*0.0255;break;
-                        default: predictedDeposit=savings*0.0265;break;
-                    
-                    }
-       return predictedDeposit;
 }
      
 // pop up message
